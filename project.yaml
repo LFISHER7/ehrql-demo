@@ -3,15 +3,51 @@ version: '5.0'
 actions:
   generate_dataset:
     run: >
-      ehrql:v1 generate-dataset solutions/dataset_definition_dep.py
-      --output output/depression_dataset.csv
+      ehrql:v1 generate-dataset solutions/dataset_definition_t2dm.py
+      --dummy-tables dummy_tables
+      --output output/dataset_t2dm.csv
     outputs:
       highly_sensitive:
-        dataset: output/depression_dataset.csv
+        dataset: output/dataset_t2dm.csv
 
-  create_histogram:
-    run: r:v3 analysis/create_histogram.R
+  create_table_python:
+    run: python:v2 analysis/create_table.py
     needs: [generate_dataset]
     outputs:
       moderately_sensitive:
-        histogram: output/histogram_age.png
+        table: output/dulaglutide_table_python.csv
+
+  create_figure_python:
+    run: python:v2 analysis/create_figure.py
+    needs: [generate_dataset]
+    outputs:
+      moderately_sensitive:
+        figure: output/dulaglutide_figure_python.png
+
+  create_table_r:
+    run: r:v3 analysis/create_table.R
+    needs: [generate_dataset]
+    outputs:
+      moderately_sensitive:
+        table: output/dulaglutide_table_r.csv
+
+  create_figure_r:
+    run: r:v3 analysis/create_figure.R
+    needs: [generate_dataset]
+    outputs:
+      moderately_sensitive:
+        figure: output/dulaglutide_figure_r.png
+
+  create_table_stata:
+    run: stata-mp:v1 analysis/create_table.do
+    needs: [generate_dataset]
+    outputs:
+      moderately_sensitive:
+        table: output/dulaglutide_table_stata.csv
+
+  create_figure_stata:
+    run: stata-mp:v1 analysis/create_figure.do
+    needs: [generate_dataset]
+    outputs:
+      moderately_sensitive:
+        figure: output/dulaglutide_figure_stata.png
