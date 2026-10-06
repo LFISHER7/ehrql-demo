@@ -1,14 +1,14 @@
-# Demo code to create a dataset of patients with type 2 diabetes, including 
+# Demo code to create a dataset of patients with type 2 diabetes, including
 #   demographic variables, dulaglutide prescription status, and ethnicity.
 
 # Demo steps:
 # Step 1: Import codelists for type 2 diabetes, dulaglutide, and ethnicity from the `codelists.txt'
 #         file by running `opensafely codelists update` in the terminal.
 # Step 2: Run the code below as-is to create a basic dataset with demographic variables
-#         with `opensafely exec ehrql:v1 generate-dataset analysis/dataset_definition_t2dm.py` 
+#         with `opensafely exec ehrql:v1 generate-dataset analysis/dataset_definition_t2dm.py`
 #         and view the dataset in the `output` folder and terminal
 # Step 3. Add a dulaglutide prescription variable to the dataset
-# Step 4. Add an ethnicity variable to the dataset, using primary care ethnicity  
+# Step 4. Add an ethnicity variable to the dataset, using primary care ethnicity
 #         where available, and SUS ethnicity where not
 
 from ehrql import case, codelist_from_csv, create_dataset, when, years, show
@@ -27,7 +27,7 @@ dataset.configure_dummy_data(population_size=1000)
 
 # Type 2 diabetes codelist
 type_2_diabetes_codes = codelist_from_csv(
-    "codelists/nhsd-primary-care-domain-refsets-dmtype2_cod.csv",
+    "codelists/user-Louis-t2-diabetes.csv",
     column="code",
 )
 
