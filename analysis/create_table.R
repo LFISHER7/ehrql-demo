@@ -14,14 +14,10 @@ group_order <- list(
 )
 
 data <- read_csv(data_path, show_col_types = FALSE)
-if (is.logical(data$has_dulaglutide)) {
-  data$dulaglutide <- data$has_dulaglutide
-} else {
-  data$dulaglutide <- tolower(as.character(data$has_dulaglutide)) %in% c("true", "1")
-}
-data$dulaglutide[is.na(data$dulaglutide)] <- FALSE
+data$dulaglutide <- tolower(as.character(data$has_dulaglutide)) %in% c("true", "t", "1")
 
 summarise_groups <- function(data, characteristic, column) {
+  group_levels <- group_order[[characteristic]]
   summary <- data |>
     group_by(.data[[column]]) |>
     summarise(
@@ -34,7 +30,7 @@ summarise_groups <- function(data, characteristic, column) {
       characteristic = characteristic,
       group = as.character(group),
       percent_dulaglutide = round(100 * n_dulaglutide / n_patients, 1),
-      sort_group = match(group, group_order[[characteristic]])
+      sort_group = match(group, group_levels)
     )
   summary$sort_group[is.na(summary$sort_group)] <- 99L
   summary
