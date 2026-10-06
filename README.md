@@ -1,60 +1,60 @@
-# OpenSAFELY ehrQL workshop
+# OpenSAFELY ehrQL walkthrough
 
-This is a template repository for an ehrQL workshop. The tasks are GitHub issues and use two examples: asthma and the QOF diabetes register.
+This repository is a walkthrough for an ehrQL workshop, where you will build a dataset of patients with type 2 diabetes, then summarise dulaglutide prescribing in this population.
 
-Before the workshop, please work through the [OpenSAFELY getting started guide](https://docs.opensafely.org/getting-started/) and the [ehrQL tutorial](https://docs.opensafely.org/ehrql/tutorials/introduction-to-ehrql/). This workshop builds on those and helps you practise good habits for writing ehrQL and doing reproducible research. You'll:
+## Repository structure
 
-- Write dataset definitions and measures definitions for realistic examples.
-- Work through tasks using GitHub issues.
-- Plot your results in R or Python.
-- Test your dataset definitions.
+```
+.
+├── analysis/                         # Walkthrough scripts
+│   ├── dataset_definition_t2dm.py    # Dataset definition. Complete each step in this file.
+│   ├── create_table.py               # Summary table in Python
+│   ├── create_table.R                # Summary table in R
+│   ├── create_table.do               # Summary table in Stata
+│   ├── create_figure.py              # Figure in Python
+│   ├── create_figure.R               # Figure in R
+│   └── create_figure.do              # Figure in Stata
+├── solutions/
+│   └── dataset_definition_t2dm.py    # Finished dataset definition
+├── codelists/
+│   └── codelists.txt                 # Codelist references used by the dataset definition
+├── dummy_tables/                     # Dummy patient data for a local run
+├── project.yaml                      # Pipeline that generates the dataset, tables, and figures
+├── output/                           # Dataset, tables, and figures are written here
+├── metadata/                         # Logs from each pipeline run.
+│   └── <action>.log                  # Messages and errors from one action
+```
 
-Running the workshop? See the [instructor guide](INSTRUCTORS.md).
 
-## Cloning the template repository
+## Set up a codespace
 
-1. Click this link to start: https://github.com/bennettoxford/ehrql-demo/generate.
-1. Leave the "**Include all branches**" option unchecked
-1. In the _General_ section, select your GitHub account as the "**Owner**" and enter a "**Repository name**" and "**Description**"
-1. In the _Configuration_ section choose "**Public**" as the repository visibility.
-1. Finally, click the "**Create repository**" button.
-1. GitHub needs a moment to set up your new repository and create the tasks. **Wait about 1 minute, then reload the page.**
+Clone this repository and create a [GitHub codespace](https://docs.opensafely.org/getting-started/tutorial/create-a-github-codespace/). See also [How to use GitHub Codespaces in your project](https://docs.opensafely.org/getting-started/how-to/use-github-codespaces-in-your-project/).
 
-## Setting up a codespace
+## Walkthrough
 
-Create a [GitHub codespace](https://docs.opensafely.org/getting-started/tutorial/create-a-github-codespace/) for your new repository. See also [How to use GitHub Codespaces in your project](https://docs.opensafely.org/getting-started/how-to/use-github-codespaces-in-your-project/).
+The dataset definition is in [`analysis/dataset_definition_t2dm.py`](analysis/dataset_definition_t2dm.py). There are comments in that file marking each step. A finished copy is in [`solutions/dataset_definition_t2dm.py`](solutions/dataset_definition_t2dm.py).
 
-## Completing the tasks
+Step 1 is to write the dataset definition. 
+Step 2 is to run the dataset definition to create the dataset. 
+Step 3 is to create the tables and figures.
 
-Your new repository comes with the tasks as GitHub issues. Pick the asthma (`ast`) example, the diabetes (`dm`) example, or both. The task numbers suggest an order, but you can skip around. Tasks 3 and 4 work with any dataset or measures definition.
+## Outputs
 
-| Task | Asthma | Diabetes |
+| Language | Table | Figure |
 | --- | --- | --- |
-| Create a dataset definition | Task 1a | Task 1b |
-| Calculate monthly prevalence | Task 2a | Task 2b |
-| Add ethnicity | Task 3 | Task 3 |
-| Add IMD | Task 4 | Task 4 |
-| Visualise your results | Task 5 | Task 5 |
-| Write assurance tests | Task 6 | Task 6 |
+| Python | `output/dulaglutide_table_python.csv` | `output/dulaglutide_figure_python.png` |
+| R | `output/dulaglutide_table_r.csv` | `output/dulaglutide_figure_r.png` |
+| Stata | `output/dulaglutide_table_stata.csv` | `output/dulaglutide_figure_stata.png` |
 
-If you're comfortable with Git and GitHub, we recommend creating a new branch for each task and merging it into `main` with a pull request when you're done. This is optional. You can also work directly on `main`.
+## Useful links
 
-Each issue tells you which file to work in. If you get stuck, the `solutions/` folder has a solution for Tasks 1, 2, 5 and 6. The files ending in `_dep` contain a depression example.
-
-## Dummy data
-
-In OpenSAFELY you never see real patient data. While you write your code, ehrQL makes up [dummy data](https://docs.opensafely.org/ehrql/how-to/dummy-data/#let-ehrql-generate-a-dummy-dataset-from-your-dataset-definition) based on your dataset or measures definition.
-
-## Resources
-
-- [OpenSAFELY Documentation](https://docs.opensafely.org/)
-- [ehrQL Documentation](https://docs.opensafely.org/ehrql/)
+- [OpenSAFELY getting started guide](https://docs.opensafely.org/getting-started/)
+- [ehrQL tutorial](https://docs.opensafely.org/ehrql/tutorials/introduction-to-ehrql/)
+- [OpenSAFELY documentation](https://docs.opensafely.org/)
+- [ehrQL documentation](https://docs.opensafely.org/ehrql/)
 - [OpenCodelists](https://www.opencodelists.org/)
-- [OpenCodeCounts](https://www.opencodecounts.net/)
-- [OpenSAFELY Platform](https://www.opensafely.org/)
-- [The OpenSAFELY Demo Repo](https://github.com/bennettoxford/os_training_demonstration)
-- [Bennett Institute introductory coding task: Implementing QOF registers in ehrQL](https://github.com/bennettoxford/bennett-research-onboarding-qof)
+- [OpenSAFELY platform](https://www.opensafely.org/)
 
 ## Licence
 
-This repository is licensed under the MIT licence, see [`LICENSE`](LICENSE).
+This repository is licensed under the MIT licence. See [`LICENSE`](LICENSE).

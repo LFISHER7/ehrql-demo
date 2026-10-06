@@ -14,12 +14,6 @@ GROUP_ORDER = {
 }
 
 
-def dulaglutide_flag(column):
-    if column.dtype == bool:
-        return column.fillna(False)
-    return column.astype(str).str.lower().isin(["true", "1"])
-
-
 def summarise_groups(data, characteristic, column):
     summary = (
         data.groupby(column, dropna=False)
@@ -39,7 +33,7 @@ def summarise_groups(data, characteristic, column):
 
 
 data = pd.read_csv(DATA_PATH)
-data["dulaglutide"] = dulaglutide_flag(data["has_dulaglutide"])
+data["dulaglutide"] = data["has_dulaglutide"].astype(str).str.lower().isin(["true", "t", "1"])
 
 overall = pd.DataFrame(
     [

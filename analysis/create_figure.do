@@ -6,7 +6,7 @@ set more off
 capture mkdir output
 
 import delimited using "output/dataset_t2dm.csv", clear varnames(1) case(lower) bindquote(strict) stringcols(_all)
-gen byte dulaglutide = inlist(lower(has_dulaglutide), "true", "1")
+gen byte dulaglutide = inlist(lower(has_dulaglutide), "true", "t", "1")
 
 tempfile source results
 save `source'
@@ -46,10 +46,10 @@ replace sort_group = 4 if group == "Black"
 replace sort_group = 5 if group == "Other"
 replace sort_group = 6 if group == "Missing"
 append using `results'
+save `results', replace
 
 use `results', clear
 gen percent_dulaglutide = round(100 * n_dulaglutide / n_patients, 0.1)
-gen label = string(n_dulaglutide) + "/" + string(n_patients)
 save `results', replace
 
 program drop _all
@@ -64,13 +64,10 @@ program define draw_panel
         local g = group[`i']
         local ylab `"`ylab' `i' "`g'""'
     }
-    twoway ///
-        bar percent_dulaglutide ypos, horizontal barwidth(0.7) ///
-            fcolor("44 127 184") lcolor(none) ///
-        || scatter ypos percent_dulaglutide, ///
-            msymbol(none) mlabel(label) mlabpos(3) mlabcolor(black) ///
-        , ylabel(`ylab', angle(0) nogrid) yscale(reverse) ///
-        xlabel(0(20)100) xscale(range(0 145)) ///
+    twoway bar percent_dulaglutide ypos, horizontal barwidth(0.7) ///
+        fcolor("44 127 184") lcolor(none) ///
+        ylabel(`ylab', angle(0) nogrid) yscale(reverse) ///
+        xlabel(0(20)100) xscale(range(0 100)) ///
         xtitle("Percent of patients") ytitle("") ///
         title("`characteristic'") legend(off) ///
         name(`name', replace)
@@ -84,5 +81,7 @@ draw_panel, characteristic("Ethnicity") name(g_ethnicity)
 
 graph combine g_sex g_age g_ethnicity, cols(3) xsize(12) ysize(5) ///
     title("Dulaglutide prescription in the year after the index date") ///
-    note("Patients with type 2 diabetes who are registered and alive on 1 January 2025. Bar labels are counts.")
-graph export "output/dulaglutide_figure_stata.png", replace width(2400)
+    note("Patients with type 2 diabetes who are registered and alive on 1 January 2025.")
+graph export "output/dulaglutide_figure_stata.pdf", replace
+shell convert -density 150 "output/dulaglutide_figure_stata.pdf" "output/dulaglutide_figure_stata.png"
+shell rm -f "output/dulaglutide_figure_stata.pdf"

@@ -20,12 +20,6 @@ CHARACTERISTICS = [
 ]
 
 
-def dulaglutide_flag(column):
-    if column.dtype == bool:
-        return column.fillna(False)
-    return column.astype(str).str.lower().isin(["true", "1"])
-
-
 def summarise_groups(data, characteristic, column):
     summary = (
         data.groupby(column, dropna=False)
@@ -44,7 +38,7 @@ def summarise_groups(data, characteristic, column):
 
 
 data = pd.read_csv(DATA_PATH)
-data["dulaglutide"] = dulaglutide_flag(data["has_dulaglutide"])
+data["dulaglutide"] = data["has_dulaglutide"].astype(str).str.lower().isin(["true", "t", "1"])
 
 fig, axes = plt.subplots(1, 3, figsize=(12, 4.5), sharex=True)
 for axis, (characteristic, column) in zip(axes, CHARACTERISTICS):
@@ -53,14 +47,7 @@ for axis, (characteristic, column) in zip(axes, CHARACTERISTICS):
     axis.barh(positions, panel["percent_dulaglutide"], color="#2c7fb8")
     axis.set_yticks(positions, panel["group"])
     axis.invert_yaxis()
-    for position, row in zip(positions, panel.itertuples(index=False)):
-        axis.text(
-            row.percent_dulaglutide + 2,
-            position,
-            f"{int(row.n_dulaglutide)}/{int(row.n_patients)}",
-            va="center",
-        )
-    axis.set_xlim(0, 145)
+    axis.set_xlim(0, 100)
     axis.set_xticks([0, 20, 40, 60, 80, 100])
     axis.set_xlabel("Percent of patients")
     axis.set_title(characteristic)
@@ -69,7 +56,7 @@ fig.suptitle("Dulaglutide prescription in the year after the index date")
 fig.text(
     0.5,
     0.01,
-    "Patients with type 2 diabetes who are registered and alive on 1 January 2025. Bar labels are counts.",
+    "Patients with type 2 diabetes who are registered and alive on 1 January 2025.",
     ha="center",
 )
 fig.tight_layout(rect=(0, 0.05, 1, 0.95))

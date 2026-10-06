@@ -6,7 +6,7 @@ set more off
 capture mkdir output
 
 import delimited using "output/dataset_t2dm.csv", clear varnames(1) case(lower) bindquote(strict) stringcols(_all)
-gen byte dulaglutide = inlist(lower(has_dulaglutide), "true", "1")
+gen byte dulaglutide = inlist(lower(has_dulaglutide), "true", "t", "1")
 
 tempfile source results
 save `source'
