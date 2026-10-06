@@ -13,7 +13,6 @@ from ehrql.tables.tpp import (
 index_date = "2025-01-01"
 
 dataset = create_dataset()
-dataset.configure_dummy_data(population_size=1000)
 
 # Type 2 diabetes codelist
 type_2_diabetes_codes = codelist_from_csv(

@@ -6,6 +6,7 @@ This repository is a walkthrough for an ehrQL workshop, where you will build a d
 
 ```
 .
+├── CHEATSHEET.md                     # ehrQL reference for this workshop
 ├── analysis/                         # Walkthrough scripts
 │   ├── dataset_definition_t2dm.py    # Dataset definition. Complete each step in this file.
 │   ├── create_table.py               # Summary table in Python
@@ -32,7 +33,7 @@ Clone this repository and create a [GitHub codespace](https://docs.opensafely.or
 
 ## Walkthrough
 
-The dataset definition is in [`analysis/dataset_definition_t2dm.py`](analysis/dataset_definition_t2dm.py). There are comments in that file marking each step. A finished copy is in [`solutions/dataset_definition_t2dm.py`](solutions/dataset_definition_t2dm.py).
+The dataset definition is in [`analysis/dataset_definition_t2dm.py`](analysis/dataset_definition_t2dm.py). There are comments in that file marking each step. A finished copy is in [`solutions/dataset_definition_t2dm.py`](solutions/dataset_definition_t2dm.py). The ehrQL features for these steps are in [`CHEATSHEET.md`](CHEATSHEET.md).
 
 Step 1 is to write the dataset definition. 
 Step 2 is to run the dataset definition to create the dataset. 
