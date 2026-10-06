@@ -1,7 +1,7 @@
-# Solution for the type 2 diabetes and dulaglutide example
-# The codelists are already in the codelists/ folder
+# Solution for the type 2 diabetes and dulaglutide example.
+# This file is the finished dataset definition.
 
-from ehrql import case, codelist_from_csv, create_dataset, when, years
+from ehrql import case, codelist_from_csv, create_dataset, when, years, show
 from ehrql.tables.tpp import (
     patients,
     clinical_events,
@@ -17,9 +17,13 @@ dataset.configure_dummy_data(population_size=1000)
 
 # Type 2 diabetes codelist
 type_2_diabetes_codes = codelist_from_csv(
-    "codelists/nhsd-primary-care-domain-refsets-dmtype2_cod.csv",
+    "codelists/user-Louis-t2-diabetes.csv",
     column="code",
 )
+
+##################
+# Codelists
+# ################
 
 # Dulaglutide codelist
 dulaglutide_codes = codelist_from_csv(
@@ -36,6 +40,10 @@ ethnicity5 = codelist_from_csv(
     category_column="Grouping_6",
 )
 
+#####################
+# Resuable variables
+# ###################
+
 # Patient is registered with a GP practice on the index date
 has_registration = practice_registrations.exists_for_patient_on(index_date)
 
@@ -49,17 +57,23 @@ has_type_2_diabetes = (
     .exists_for_patient()
 )
 
+
+#####################
+# Dataset variables
+# ###################
+
 # Patient sex
 dataset.sex = patients.sex
 
 # Patient age band on the index date
-age = patients.age_on(index_date)
+dataset.age = patients.age_on(index_date)
+
 dataset.age_band = case(
-    when(age < 20).then("0-19"),
-    when(age < 40).then("20-39"),
-    when(age < 60).then("40-59"),
-    when(age < 80).then("60-79"),
-    when(age >= 80).then("80+"),
+    when(dataset.age < 20).then("0-19"),
+    when(dataset.age < 40).then("20-39"),
+    when(dataset.age < 60).then("40-59"),
+    when(dataset.age < 80).then("60-79"),
+    when(dataset.age >= 80).then("80+"),
     otherwise="missing",
 )
 
