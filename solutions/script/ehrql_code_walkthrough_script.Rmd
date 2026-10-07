@@ -1,0 +1,196 @@
+---
+title: "ehrQL code walkthrough"
+output: word_document
+---
+
+### Codespaces orientation
+
+We have seen our map of codespaces, and now that we have it open, let's review where everything is.
+
+First we have our script panel in the center, which is where we'll write our ehrQL and analysis code in R, python, or STATA.
+
+On the left we have a menu, with it set to the file directory by default. We can also use github in this panel for version control or to work collaboratively.
+
+At the bottom we have our terminal. This is where we'll run commands that run our ehrQL or other analysis code.
+
+On the right we have an AI panel, which you need to set up in github if you want to use it.
+
+We also have a search bar at the top.
+
+### Check setup
+
+First lets just check what is available to us through opensafely. In the terminal, we'll type `opensafely` and we'll get a list of commands we can run.
+
+Some to point out are `run`, `generate-dataset`,`codelists`, and `exec`, which stands for execute. We can use `exec` to call individual files.
+
+### Orientation to EhrQL files
+
+When you start a project in OpenSAFELY, you will use a template to set up your project. This repository used a template for setup. This is what allows us to use CodeSpaces that already has the versions of OpenSAFELY, ehrQL, python, R, and other languages and software pre-loaded.
+
+It also comes with scaffolding for an OpenSAFELY project.
+
+This scaffolding includes many folders that help organize your code. The ones that we'll be working in today are 'analysis' and 'codelists', and in the file `project.yaml`.
+
+### Introduce study
+
+For our first ehrQL inquiry, we are going to run a descriptive analysis to examine how many patients who have a diagnosis of type 2 diabetes have been prescribed dulaglutide within a study period. To be included in the study, patients should be registered at a TPP practice, alive on our study date, and have a diagnosis of type 2 diabetes. We want to examine our results by age and ethnicity.
+
+### Adding codelists
+
+If we click on our 'codelists' script we can see a codelists.txt file.
+
+As the file extension suggests, this is just a regular text file, and does not contain any code. However, our opensafely software tool will use this to pull in the codelists listed here.
+
+Each of these lines is a reference to a codelist in opencodelists. In a new tab in our browser, if we type in `codelists.com/` and then copy and paste one of these lines after that, we can see the codelist on the opencodelists website.
+
+Here we can see which codes are included and explore the tree as well.
+
+#### Running an `opensafely` command
+
+To get our opensafely tool to pull in these codelists, we will click into our terminal after the last `$` and write: `opensafely codelists update`
+
+Now we can see that a few things have changed in our directory. For one, we now have a `codelists.json` file. And we also have several files. If we click into them, we can see our codelists, with the columns that we expect to see for each type of data. For clinical events, such as type 2 diabetes diagnoses, we can see the SNOMED CT code, a date, and a description. For duraglutide, which is a medication, we see a date, a dmd code, and a description.
+
+We can now reference these codelists in our other code.
+
+### Intro to ehrQL
+
+Now we can finally take a look at some ehrQL code.
+
+We'll go back to our file directory, and this time we'll click on our 'analysis' folder.
+
+#### Script orientation
+
+We have set up a some code to get us started. The first thing to note is
+
+Some Text at the top. For those of you who are familiar with R or python, this will be familiar. For those new to these languages, the \# preceding text creates what we call a 'comment.' Any text after a \# is a not used by the computer as code. We call this 'commenting out' text. This can be done for code that you have written and want to keep, but do not want to run, or you can use it to write plain language notes to yourself or other users of the script.
+
+Here, we've written a quick description of the file, followed by the steps we'll follow today.
+
+\*\**Read through the steps.\*\**
+
+Below that we have our first bits of ehrQL code.
+
+#### Reading ehrQL code
+
+As a reminder, ehrQL is based on python. If you normally code in R, you start by loading libraries. In python, we import libraries. In python though, you can import a whole library, but then you have to reference the library every time you use a method, which I may also call a function throughout.
+
+On line 14, we import some methods from ehrql. Notice that this is all written in lowercase. Python is case-sensitive, so you'll need to be careful about this.
+
+next we import tables from ehrql.tables.tpp because we're importing tables from systemone.
+
+Now we have everything we need to start defining variables in our script.
+
+First, I am going to define what a `variable` is. Many people use this word to refer to a name of a column in a data frame or other table data. That is correct, but it can also refer to any other named object.
+
+Our first variable is `index_date`, set to 1 January 2025. We will refer to this later.
+
+##### Create and set up our dataset
+
+Next we create our dataset object with the ehrql method `create_dataset()`. This is a special ehrQL object which helps us build our one row per patient custom dataset, pulling data from other tables.
+
+Next, we're running an *optional* step of configuring our 'dummy', or fake, data to a population size of 1000. This is enough to help make our visualizations and tables somewhat realistic without taking too long to run. For R users, notice that calling methods on an object works a little differently than we normally see in R tidyverse-style coding. In ehrql, some of the objects we create, including datasets, will have associated methods. You call these associated methods with a `.`. This method also takes an argument, but they don't always.
+
+##### Using codelists in ehrQL
+
+##### Clinical variables
+
+Next we need to pull in our type 2 diabetes codes. we use another ehrQL method, `codelist_from_csv` to pull our codelists from our codelist csv that we imported into our 'codelist' folder. Here we're creating a list of codes that we have named `type_2_diabetes_codes`. If we look at the csv, the values in this list will correspond with the values in the `snomedct_code` column. Again, we'll refer to this list of codes later.
+
+###### Referencing EHR tables
+
+###### `practice_registrations`
+
+After a comment that labels a section or re-usable variables, we have code, that is described in the comment above the code, that uses the practice registrations table. On `practice_registrations` we call the `exists_for_patient_on` method and we pass the `index_date`, which we set earlier, as an argument. In the documentation, we can find this method in the `practice_registrations` [section](https://docs.opensafely.org/ehrql/reference/schemas/tpp/#practice_registrations) and we can see that the method will return one value for each patient, a `True` or `False`, which indicates whether or not a patient was registered at a TTP/systemone practice on the index date.
+
+###### `patients`
+
+Next we'll use the `patients` table and its associated method `is_alive_on()` with the index date defined above. This will return one row per patient with a value of `True` or `False`.
+
+###### `clinical_events`
+
+Next we'll create an object to indicate if a patient has a diagnosis of type 2 diabetes, as defined by our snomed codelist that we defined above, stored as `type_2_diabetes_codes`. First the code calls `where` on the `clinical_events` object, and then we get a little more complex with our query. In ehrql, we filter data on specific columns. Here we want to filter on the `snomedct_code` column of the `clinical_events` table. Then we call a method on *that column*, `is_in` and pass the codelist in as an argument. Once we have all of the rows of `clinical_events` with the relevant snomed codes, we chain another `where` argument to the output, which we filter again, this time on the `clinical_events` `date` column, and we use the method `is_on_or_before` and pass in the index date. This will return all of the rows with a date on or before the index date, which means we still can have more than one row per patient. We then call another method `exists_for_patient`, which will return `True` for any patients with at least one row in the `clinical_events` table that meets the criteria we have defined.
+
+##### Demographic variables
+
+Now we add the demographic variables, using the patients table, which contains one row per patient. `patients.sex` will return the value from the `patients` table. Calling `patients.age_on` with the index date will calculate the age in years between the patients date of birth and the index date.
+
+We can then use the `case` and `when` python functions to use `dataset.age`, which we have defined above, to create a categorical variable, with one row per patient.
+
+##### Define the population
+
+Next we need to define our patient population. YOu can think of this as setting the denominator, or applying eligibility criteria. Here we call `define_population` on the dataset object, with a logic argument that filters patients for those in which `has_registration` and `is_alive` and `has_type_2_diabetes`, all variables that we have defined, are `True`.
+
+#### Running ehrQL code
+
+Now that we have a full dataset definition, where we have defined some demographic columns, we can run the code. Note, however, that we have not used our clinical variables to define any columns in our dataset. We will add more columns later. For now, we will run this code to see what the output looks like. Since we are not in a secure environment, the opensafely tool will use dummy data to produce datasets.
+
+To run this dataset definition, we will click in the terminal, and run the command `opensafely exec ehrql:v1 generate-dataset analysis/dataset_definition_t2dm.py`. For the sake of time, we're not going to go into every part of this, but we overall, we're asking opensafely to execute a dataset generation using the code in our analysis code. Using this method for running the code, we can see the output of the code in our console. If you scroll to the top, you can see that our dataset contains a patient_id column, one for each patient, and then the three columns that we have defined.
+
+Note that the age column contains a single number, indicating a an age in years, while our `age_band` column contains the character strings as defined in our case when statement.
+
+### Code challenge
+
+#### Self directed work
+
+Now you will have about 15 minutes to execute steps 3 and 4. This is not a lot of time, so do not worry if you do not complete both. I will show the solutions after you've had a change to use the opensafely documentation, as <https://docs.opensafely.org>
+
+#### Solutions
+
+##### Adding a dulaglutide column
+
+Who can describe the first step we need to take before adding a column indicating whether a patient has been presribed dulaglutide?
+
+*\*Participants will share first step, creating a variable to define the codelist associated with dulaglutide prescriptions\**
+
+
+*\*show code on screen and walk through\**
+
+How do we now add a column to our dataset?
+
+*\*Participants will share first step, creating a variable to define the codelist associated with dulaglutide prescriptions\**
+
+
+*\*show code on screen and walk through\**
+
+Now we will run the opensafely command to see what our new dataset looks like, with our new column. 
+
+##### Adding ethnicity
+
+Who can describe the first step we need to take before adding a column indicating a patients ethnicity?
+
+*\*Participants will share first step, creating a variable to define the codelist associated with dulaglutide prescriptions\**
+
+
+*\*show code on screen and walk through\**
+
+How do we now add a column to our dataset?
+
+*\*Participants will share first step, creating a variable to define the codelist associated with dulaglutide prescriptions\**
+
+
+*\*show code on screen and walk through\**
+
+Now we will run the opensafely command to see what our new dataset looks like, with our new column.
+
+## Data analysis
+
+Now that we have a data set defined, we can analyze dataset.csv using R, python, or STATA. 
+
+*\*If there's time, ask the students to produce one output that described data. If they have, ask them to describe their outputs\**
+OR
+*\*If no time for more coding, as students what they might want to produce as analyses.\**
+
+*\*Walk through moving analysis files from solutions folder to analysis folder, and run\**
+
+## Data analysis
+
+*\*If there's time, show Github workflow\**
+
+
+## Wrap up
+
+*back to slides*
+
+
+
