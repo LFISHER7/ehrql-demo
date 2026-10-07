@@ -1,11 +1,12 @@
-# Table of dulaglutide prescribing in the year after the index date
+# Figure of dulaglutide prescribing in the year after the index date
 
 library(readr)
 library(dplyr)
+library(ggplot2)
 library(here)
 
 data_path <- here("output", "dataset_t2dm.csv")
-table_path <- here("output", "dulaglutide_table_r.csv")
+figure_path <- here("output", "dulaglutide_figure_r.png")
 
 group_order <- list(
   Sex = c("female", "male"),
@@ -34,32 +35,39 @@ summarise_groups <- function(data, characteristic, column) {
       characteristic = characteristic,
       group = as.character(group),
       percent_dulaglutide = round(100 * n_dulaglutide / n_patients, 1),
-      sort_group = match(group, group_order[[characteristic]])
-    )
+      label = paste0(n_dulaglutide, "/", n_patients)
+    ) %>%
+    rowwise() %>%
+    mutate(sort_group = match(group, group_order[[characteristic]]))
   summary$sort_group[is.na(summary$sort_group)] <- 99L
   summary
 }
 
-overall <- data.frame(
-  characteristic = "Overall",
-  group = "All patients",
-  n_patients = nrow(data),
-  n_dulaglutide = sum(data$dulaglutide),
-  percent_dulaglutide = round(100 * mean(data$dulaglutide), 1),
-  sort_group = 0,
-  sort_characteristic = 0
-)
-
 sex <- summarise_groups(data, "Sex", "sex")
-sex$sort_characteristic <- 1
 age_band <- summarise_groups(data, "Age band", "age_band")
-age_band$sort_characteristic <- 2
 ethnicity <- summarise_groups(data, "Ethnicity", "ethnicity")
-ethnicity$sort_characteristic <- 3
 
-table <- bind_rows(overall, sex, age_band, ethnicity) |>
-  arrange(sort_characteristic, sort_group) |>
-  select(characteristic, group, n_patients, n_dulaglutide, percent_dulaglutide)
+plot_data <- bind_rows(sex, age_band, ethnicity) |>
+  mutate(
+    characteristic = factor(characteristic, levels = c("Sex", "Age band", "Ethnicity"))
+  ) |>
+  arrange(characteristic, sort_group) |>
+  mutate(group = factor(group, levels = unique(group)))
+
+figure <- ggplot(plot_data, aes(x = group, y = percent_dulaglutide)) +
+  geom_col(fill = "#2c7fb8", width = 0.7) +
+  geom_text(aes(label = label), hjust = -0.1, size = 3) +
+  facet_wrap(~characteristic, scales = "free_x") +
+  coord_flip() +
+  scale_y_continuous(limits = c(0, 145), breaks = seq(0, 100, 20)) +
+  labs(
+    x = NULL,
+    y = "Percent of patients",
+    title = "Dulaglutide prescription in the year after the index date",
+    caption = "Patients with type 2 diabetes who are registered and alive on 1 January 2025. Bar labels are counts."
+  ) +
+  theme_bw() +
+  theme(panel.grid.major.y = element_blank())
 
 dir.create(here("output"), showWarnings = FALSE)
-write_csv(table, table_path)
+ggsave(figure_path, figure, width = 12, height = 4.5)
