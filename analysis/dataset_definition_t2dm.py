@@ -25,26 +25,16 @@ index_date = "2025-01-01"
 dataset = create_dataset()
 dataset.configure_dummy_data(population_size=100)
 
-# Type 2 diabetes codelist
-type_2_diabetes_codes = list_from_csv(
-    "codelists/nhsd-primary-care-domain-refsets-dmtype2_cod.csv",
-    column="code",
-)
 
 ##################
 # Codelists
 # ################
 
-
-# Ethnicity codelist
-# Grouping_6 holds groups 1 to 5. Group 6 is "Not stated".
-# "Not stated" has no SNOMED code. No code means missing ethnicity.
-# Demo Step 4: Add ethnicity to the dataset, using primary care ethnicity where available, and SUS ethnicity where not
-# ethnicity5 = codelist_from_csv(
-#     "codelists/opensafely-ethnicity-snomed-0removed.csv",
-#     column="code",
-#     category_column="Grouping_6",
-# )
+# Type 2 diabetes codelist
+type_2_diabetes_codes = list_from_csv(
+    "codelists/nhsd-primary-care-domain-refsets-dmtype2_cod.csv",
+    column="code",
+)
 
 #####################
 # Resuable variables
