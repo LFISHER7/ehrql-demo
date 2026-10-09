@@ -24,33 +24,17 @@ index_date = "2025-01-01"
 
 dataset = create_dataset()
 
-# Type 2 diabetes codelist
-type_2_diabetes_codes = codelist_from_csv(
-    "codelists/user-Louis-t2-diabetes.csv",
-    column="code",
-)
+dataset.configure_dummy_data(population_size=100)
 
 ##################
 # Codelists
 # ################
 
-
-# Dulaglutide codelist
-# Demo Step 3: Add whether patient has a dulaglutide prescription in the last year
-# dulaglutide_codes = codelist_from_csv(
-#     "codelists/opensafely-dulaglutide.csv",
-#     column="code",
-# )
-
-# Ethnicity codelist
-# Grouping_6 holds groups 1 to 5. Group 6 is "Not stated".
-# "Not stated" has no SNOMED code. No code means missing ethnicity.
-# Demo Step 4: Add ethnicity to the dataset, using primary care ethnicity where available, and SUS ethnicity where not
-# ethnicity5 = codelist_from_csv(
-#     "codelists/opensafely-ethnicity-snomed-0removed.csv",
-#     column="code",
-#     category_column="Grouping_6",
-# )
+# Type 2 diabetes codelist
+type_2_diabetes_codes = codelist_from_csv(
+    "codelists/nhsd-primary-care-domain-refsets-dmtype2_cod.csv",
+    column="code",
+)
 
 #####################
 # Resuable variables
@@ -89,53 +73,6 @@ dataset.age_band = case(
     otherwise="missing",
 )
 
-# Latest primary care ethnicity on or before the index date
-# Demo Step 4: Add ethnicity to the dataset, using primary care ethnicity where available, and SUS ethnicity where not
-# ethnicity_snomed = (
-#     clinical_events.where(clinical_events.snomedct_code.is_in(ethnicity5))
-#     .where(clinical_events.date.is_on_or_before(index_date))
-#     .sort_by(clinical_events.date)
-#     .last_for_patient()
-#     .snomedct_code.to_category(ethnicity5)
-# )
-
-# SUS ethnicity, used where primary care ethnicity is missing
-# Demo Step 4: Add ethnicity to the dataset, using primary care ethnicity where available, and SUS ethnicity where not
-# ethnicity_sus = ethnicity_from_sus.code
-
-# Demo Step 4: Add ethnicity to the dataset, using primary care ethnicity where available, and SUS ethnicity where not
-# dataset.ethnicity = case(
-#     when(
-#         (ethnicity_snomed == "1")
-#         | (ethnicity_snomed.is_null() & ethnicity_sus.is_in(["A", "B", "C"]))
-#     ).then("White"),
-#     when(
-#         (ethnicity_snomed == "2")
-#         | (ethnicity_snomed.is_null() & ethnicity_sus.is_in(["D", "E", "F", "G"]))
-#     ).then("Mixed"),
-#     when(
-#         (ethnicity_snomed == "3")
-#         | (ethnicity_snomed.is_null() & ethnicity_sus.is_in(["H", "J", "K", "L"]))
-#     ).then("South Asian"),
-#     when(
-#         (ethnicity_snomed == "4")
-#         | (ethnicity_snomed.is_null() & ethnicity_sus.is_in(["M", "N", "P"]))
-#     ).then("Black"),
-#     when(
-#         (ethnicity_snomed == "5")
-#         | (ethnicity_snomed.is_null() & ethnicity_sus.is_in(["R", "S"]))
-#     ).then("Other"),
-#     otherwise="Missing",
-# )
-
-# Patient has a dulaglutide prescription in the year after the index date
-# Demo Step 3: Add whether patient has a dulaglutide prescription in the last year
-# one_year_after = index_date + years(1)
-# dataset.has_dulaglutide = (
-#     medications.where(medications.dmd_code.is_in(dulaglutide_codes))
-#     .where(medications.date.is_on_or_between(index_date, one_year_after))
-#     .exists_for_patient()
-# )
 
 # Define population
 dataset.define_population(has_registration & is_alive & has_type_2_diabetes)
